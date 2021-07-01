@@ -321,18 +321,21 @@ Node::fullpath()
 }
 
 void
-Node::walk(Walker * w, NodeType t, bool children_first)
+Node::walk(Walker * w, NodeType t, TraversalOrder o)
 {
-  if (children_first)
+  // traverse children first
+  if (o == TraversalOrder::AfterChildren)
     for (auto child : _children)
-      child->walk(w, t, children_first);
+      child->walk(w, t, o);
 
+  // execute walker
   if (_type == t || t == NodeType::All)
     w->walk(fullpath(), pathNorm(path()), this);
 
-  if (!children_first)
+  // traverse children last
+  if (o == TraversalOrder::BeforeChildren)
     for (auto child : _children)
-      child->walk(w, t, children_first);
+      child->walk(w, t, o);
 }
 
 Node *
